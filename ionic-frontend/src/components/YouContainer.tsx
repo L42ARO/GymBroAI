@@ -11,9 +11,7 @@ interface YouContainerProps {
 
 const YouContainer: React.FC<YouContainerProps> = ({name}) => {
   return (
-    <IonPage>
-      <IonContent>
-        <div className="container">
+        <div>
           <IonItem>
             <IonIcon icon={personOutline}></IonIcon> 
             <IonLabel>Account</IonLabel>
@@ -50,8 +48,6 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
             {/* <IonLabel>{restTimerLabel}</IonLabel> */}
           </IonItem>
         </div>
-      </IonContent>
-    </IonPage>
   );
 };
 

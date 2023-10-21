@@ -24,9 +24,8 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
   restTimerLabel,
 }) => {
   return (
-    <IonPage>
-      <IonContent>
-        <div className="container">
+    
+        <div>
           <IonItem>
             <IonIcon icon={calendarOutline}></IonIcon> 
             <IonLabel>Routine</IonLabel>
@@ -63,8 +62,6 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
             <IonLabel>{restTimerLabel}</IonLabel>
           </IonItem>
         </div>
-      </IonContent>
-    </IonPage>
   );
 };
 
