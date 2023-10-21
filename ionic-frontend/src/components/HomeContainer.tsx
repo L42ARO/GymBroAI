@@ -1,11 +1,11 @@
 import './ExploreContainer.css';
 
 
-interface ContainerProps {
+interface HomeContainerProps {
   name: string;
 }
 
-const HomeContainer: React.FC<ContainerProps> = ({ name }) => {
+const HomeContainer: React.FC<HomeContainerProps> = ({ name }) => {
   return (
     <div className="container">
 
