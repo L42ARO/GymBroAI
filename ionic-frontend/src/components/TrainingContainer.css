@@ -1,0 +1,25 @@
+/* TrainingContainer.css */
+
+.container {
+    position: relative; /* Make the container a positioned element */
+  }
+  
+  /* Increase the z-index value to place the container on top */
+  .container .calendar-icon {
+    z-index: 2;
+  }
+  
+  /* Add styles to customize the icon and item */
+  .calendar-icon {
+    color: red; /* Change color to something visible */
+    font-size: 24px; /* Adjust the size as needed */
+    background-color: white;
+  }
+  /* TrainingContainer.css */
+
+/* Add space to the right of the IonIcon */
+ion-icon {
+    margin-right: 8px; /* Adjust the value as needed for the desired space */
+  }
+  
+  
