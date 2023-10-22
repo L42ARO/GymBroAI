@@ -35,6 +35,7 @@ import '@ionic/react/css/typography.css';
 import './theme/variables.css';
 import './theme/tailwind.css';
 import { SocketProvider } from './contexts/socketContext';
+import TerraAuth from './pages/TerraAuth';
 
 setupIonicReact();
 
@@ -53,6 +54,9 @@ const App: React.FC = () => (
           <Route path="/settings">
             <Settings />
           </Route>
+          <Route path="/auth/terra">
+            <TerraAuth />
+            </Route>
           <Route exact path="/">
             <Redirect to="/home" />
           </Route>
