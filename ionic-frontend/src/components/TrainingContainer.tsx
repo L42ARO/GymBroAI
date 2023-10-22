@@ -1,7 +1,9 @@
 import './TrainingContainer.css';
 import { IonPage, IonContent, IonItem, IonLabel } from '@ionic/react';
-import { IonIcon } from '@ionic/react';
+import { IonIcon, IonButton, IonModal } from '@ionic/react';
 import { alarmOutline, barChartOutline, barbellOutline, calendarOutline, planetOutline, rocketOutline, starOutline, timerOutline } from 'ionicons/icons';
+import { useState } from 'react';
+import DurationSelector from './DurationSelectorContainer';
 
 interface TrainingContainerProps {
   name: string;
@@ -16,15 +18,23 @@ interface TrainingContainerProps {
 
 const TrainingContainer: React.FC<TrainingContainerProps> = ({
   routineLabel,
-  durationLabel,
   objectiveLabel,
   equipmentLabel,
   weeklyGoalLabel,
   experienceLabel,
   restTimerLabel,
 }) => {
+  const [showDurationModal, setShowDurationModal] = useState(false);
+  const [durationLabel, setDurationLabel] = useState(''); // Initialize as needed
+
+  const handleDurationConfirmed = (duration: { hours: number, minutes: number, seconds: number }) => {
+    const newDuration = duration.hours + "h " + duration.minutes + "m " + duration.seconds + "s";
+    setDurationLabel(newDuration);
+    setShowDurationModal(false);
+  };
+  
+
   return (
-    
         <div>
           <IonItem>
             <IonIcon icon={calendarOutline}></IonIcon> 
@@ -34,7 +44,12 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
           <IonItem>
             <IonIcon icon={timerOutline}> </IonIcon>
             <IonLabel>Duration</IonLabel>
-            <IonLabel>{durationLabel}</IonLabel>
+            {/* <IonLabel>{durationLabel}</IonLabel> */}
+            <IonButton onClick={() => setShowDurationModal(true)}><IonLabel>{durationLabel}</IonLabel></IonButton>
+            <IonModal isOpen={showDurationModal} onDidDismiss={() => setShowDurationModal(false)}>
+              <DurationSelector onConfirm={handleDurationConfirmed} />
+              <IonButton onClick={() => setShowDurationModal(false)}>Cancel</IonButton>
+            </IonModal>
           </IonItem>
           <IonItem>
             <IonIcon icon={starOutline}> </IonIcon>
