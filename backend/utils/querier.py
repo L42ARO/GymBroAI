@@ -2,6 +2,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.output_parsers import PydanticOutputParser
 from langchain.memory import ChatMessageHistory
+from langchain.schema.messages import SystemMessage, HumanMessage, AIMessage
 from typing import Tuple
 
 import prompts
@@ -113,7 +114,16 @@ success, response, history = query_for_workout_specifications("api-key.txt", Cha
 while not success:
     print(response)
     history2 = history.json()
-    history2 = ChatMessageHistory.parse_raw(history2)
+    history2 = json.loads(history2)
+    history2 = ChatMessageHistory.parse_obj(history2)
+    for i in range(len(history2.messages)):
+        if history2.messages[i].type == "system": 
+            history2.messages[i] = SystemMessage(content = history2.messages[i].content)
+        elif history2.messages[i].type == "ai":
+            history2.messages[i] = AIMessage(content = history2.messages[i].content)
+        elif history2.messages[i].type == "human":
+            history2.messages[i] = HumanMessage(content = history2.messages[i].content)
+
     success, response, history3 = query_for_workout_specifications("api-key.txt", history2, False)
 
 workout, history = query_workout("api-key.txt", response, None, False)
