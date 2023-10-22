@@ -10,7 +10,6 @@ interface SettingsContainerProps {
 
 const SettingsContainer: React.FC<SettingsContainerProps> = ({ name }) => {
   return (
-    <IonPage>
       <IonContent>
         <IonGrid>
           <IonRow>
@@ -31,7 +30,6 @@ const SettingsContainer: React.FC<SettingsContainerProps> = ({ name }) => {
           </IonRow>
         </IonGrid>
       </IonContent>
-    </IonPage>
   );
 };
 
