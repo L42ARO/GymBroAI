@@ -6,6 +6,7 @@ import requests
 import os
 from PIL import Image
 import base64
+from utils.querier import query_for_workout_specifications, ChatMessageHistory, query_workout
 from io import BytesIO
 
 @app.route('/')
@@ -34,14 +35,31 @@ def handle_user_request(data):
     #   'terra-user-id': string
     #   'history': dict
     #   'context-props': dict
-    #   're-query': boolean
+    #   'requery': boolean
     # }
+    print("---------- USER REQUEST ----------")
     room = data['room']
     query = data['query']
-    
-    # TODO: Handle query
-    res = 'This is a response from the server!'
-    res_type = 'text'
+    requery = data['requery']
+    prevHistory = ChatMessageHistory()
+    if requery:
+        messages= data['history']
+        prevHistory = ChatMessageHistory.parse_obj(messages)
+        print(prevHistory['messages'])
+        # prevHistory = ChatMessageHistory(messages=messages['messages'])
+        print(prevHistory)
+    success, response, history = query_for_workout_specifications("api-key.txt", prevHistory, enable_sleep_hours=False, query=query)
+    if not success:
+        hist_json = history.json()
+        emit('re-query', {'response': response, 'history': history.json()}, room=room)
+        return
+
+    # Get the workout
+    workout, history = query_workout("api-key.txt", response, None,True)
+
+    workout_json = workout.json()
+    emit('workout-response', {'response': workout_json, 'history': history.json()}, room=room)
+    '''
     
     #response can either be text or list
     if res_type == 'text':
@@ -49,7 +67,7 @@ def handle_user_request(data):
         emit('text-response', {'response': res}, room=room)
     elif res_type == 'list':
         # Emit response to room
-        emit('list-response', {'response': res}, room=room)
+        emit('list-response', {'response': res}, room=room)'''
 
 @socketio.on('terra-auth')
 def handle_terra_auth(data):
