@@ -125,14 +125,14 @@ def get_routine_image(filename):
 #             return os.path.join(root, image_name)
 #     return None
 
-def find_png_file(base_directory, target_filename):
-    for root, dirs, files in os.walk(base_directory):
-        for directory in dirs:
-            for file in directory:
-                if file.lower() == target_filename.lower():
-                    return os.path.join(root, file)
+# def find_png_file(base_directory, target_filename):
+#     for root, dirs, files in os.walk(base_directory):
+#         for directory in dirs:
+#             for file in directory:
+#                 if file.lower() == target_filename.lower():
+#                     return os.path.join(root, file)
 
-    return None
+#     return None
 
 
 if __name__ == '__main__':
