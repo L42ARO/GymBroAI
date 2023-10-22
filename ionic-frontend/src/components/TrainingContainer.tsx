@@ -13,7 +13,6 @@ interface TrainingContainerProps {
   equipmentLabel: string;
   weeklyGoalLabel: string;
   experienceLabel: string;
-  restTimerLabel: string;
 }
 
 const TrainingContainer: React.FC<TrainingContainerProps> = ({
@@ -22,13 +21,14 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
   equipmentLabel,
   weeklyGoalLabel,
   experienceLabel,
-  restTimerLabel,
 }) => {
   const [showDurationModal, setShowDurationModal] = useState(false);
-  const [durationLabel, setDurationLabel] = useState(''); // Initialize as needed
+  const [durationLabel, setDurationLabel] = useState('0 h 0 m 0 s'); // Initialize as needed
+
+  
 
   const handleDurationConfirmed = (duration: { hours: number, minutes: number, seconds: number }) => {
-    const newDuration = duration.hours + "h " + duration.minutes + "m " + duration.seconds + "s";
+    const newDuration = duration.hours + " h " + duration.minutes + " m " + duration.seconds + " s";
     setDurationLabel(newDuration);
     setShowDurationModal(false);
   };
@@ -42,15 +42,17 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
             <IonLabel>{routineLabel}</IonLabel>
           </IonItem>
           <IonItem>
-            <IonIcon icon={timerOutline}> </IonIcon>
+            <IonIcon icon={timerOutline}></IonIcon>
             <IonLabel>Duration</IonLabel>
-            {/* <IonLabel>{durationLabel}</IonLabel> */}
-            <IonButton onClick={() => setShowDurationModal(true)}><IonLabel>{durationLabel}</IonLabel></IonButton>
+            <IonButton onClick={() => setShowDurationModal(true)} className="duration-button">
+              {durationLabel}
+            </IonButton>
             <IonModal isOpen={showDurationModal} onDidDismiss={() => setShowDurationModal(false)}>
               <DurationSelector onConfirm={handleDurationConfirmed} />
               <IonButton onClick={() => setShowDurationModal(false)}>Cancel</IonButton>
             </IonModal>
           </IonItem>
+
           <IonItem>
             <IonIcon icon={starOutline}> </IonIcon>
             <IonLabel>Objective</IonLabel>
@@ -70,11 +72,6 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
             <IonIcon icon={planetOutline}> </IonIcon>
             <IonLabel>Experience</IonLabel>
             <IonLabel>{experienceLabel}</IonLabel>
-          </IonItem>
-          <IonItem>
-            <IonIcon icon={alarmOutline}> </IonIcon>
-            <IonLabel>Rest Timer</IonLabel>
-            <IonLabel>{restTimerLabel}</IonLabel>
           </IonItem>
         </div>
   );
