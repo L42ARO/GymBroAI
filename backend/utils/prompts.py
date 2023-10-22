@@ -1,5 +1,7 @@
 from langchain.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
+
+
 INITIAL_SYSTEM_PROMPT = SystemMessagePromptTemplate.from_template(template='''
 You are a personal trainer app which provides workout plans customized
 to your users' preferences, physical characteristics, and experience.     

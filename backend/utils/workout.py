@@ -30,6 +30,7 @@ class Exercise(BaseModel):
     difficulty: ExerciseDifficulty = Field(description="The difficulty level of the exercise. \
                                            Possible values are beginner, intermediate, and expert")
     sets: list[Set] = Field(description="The list of sets to be done for this exercise")
+    
 
 class Workout(BaseModel):
     exercises: list[Exercise] = Field(description="The list of exercises to be done for the workout")

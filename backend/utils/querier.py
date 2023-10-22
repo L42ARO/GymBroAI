@@ -87,12 +87,12 @@ def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user) -
     history.add_message(messages[1])
     history.add_message(messages[2])
 
+
     chat_model = ChatOpenAI(openai_api_key=OPENAI_API_KEY)
     response = chat_model(chat_prompt_template.format_messages())
     history.add_message(response)
 
     return parser.parse(response.content), history
-
 
 
 def query_further(api_key_path: str, prompt: str, history: ChatMessageHistory, user) -> Tuple[Workout, ChatMessageHistory]:
@@ -110,3 +110,17 @@ def query_further(api_key_path: str, prompt: str, history: ChatMessageHistory, u
     history.add_message(response)
 
     return parser.parse(response.content), history
+
+success, response, history = query_for_workout_specifications("api-key.txt", ChatMessageHistory())
+while not success:
+    print(response)
+    success, response, history = query_for_workout_specifications("api-key.txt", history)
+
+workout, history = query_workout("api-key.txt", response, None)
+print(workout)
+
+while True:
+    workout, history = query_further("api-key.txt", input(), history, None)
+    print(workout)
+
+
