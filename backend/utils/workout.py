@@ -1,17 +1,23 @@
 from enum import Enum
 
-class BodyArea(Enum):
-    CHEST = 1
-    SHOULDERS = 2
-    BACK = 3
-    ARMS = 4
-    CORE = 5
-    LEGS = 6
+class ExerciseBodyArea(Enum):
+    CHEST = 0
+    SHOULDERS = 1
+    BACK = 2
+    ARMS = 3
+    CORE = 4
+    LEGS = 5
+
+class ExerciseDifficulty(Enum):
+    BEGINNER = 0
+    INTERMEDIATE = 1
+    EXPERT = 2
 
 class Exercise:
-    def __init__(self, name: str, bodyarea: BodyArea, ):
+    def __init__(self, name: str, difficulty: ExerciseDifficulty, bodyareas: list[ExerciseBodyArea]):
         self.name: str = name
-        self.bodyarea: BodyArea = bodyarea
+        self.bodyarea: list[ExerciseBodyArea] = bodyareas
+        self.difficulty = difficulty
 
 class Set:
     def __init__(self, num_reps: int, weight: int):
