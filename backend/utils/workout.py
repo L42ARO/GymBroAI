@@ -1,6 +1,9 @@
 from enum import Enum
 from langchain.pydantic_v1 import BaseModel, Field
 
+with open("./backend/utils/exercises_uppercase.txt") as f:
+    ALL_EXERCISES: list[str] = [e.replace("\n", "") for e in f.readlines()]
+
 class ExerciseBodyArea(Enum):
     CHEST = 0
     SHOULDERS = 1

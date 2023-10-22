@@ -1,12 +1,11 @@
 from langchain.prompts import ChatPromptTemplate
 from langchain.chat_models import ChatOpenAI
 from langchain.output_parsers import PydanticOutputParser
-from langchain.pydantic_v1 import BaseModel, Field
 from langchain.memory import ChatMessageHistory
 from typing import Tuple
 
 import prompts
-from workout import *
+from workout import WorkoutSpecification, Workout, ALL_EXERCISES
 
 def user_characteristics(user):
     '''
@@ -33,7 +32,7 @@ def user_characteristics(user):
     }
 
 
-def query_for_workout_specifications(api_key_path: str, history: ChatMessageHistory)\
+def query_for_workout_specifications(api_key_path: str, history: ChatMessageHistory, enable_sleep_hours: bool)\
     -> Tuple[bool, str | WorkoutSpecification, ChatMessageHistory]:
     with open(api_key_path) as f:
         OPENAI_API_KEY = f.read()
@@ -41,7 +40,9 @@ def query_for_workout_specifications(api_key_path: str, history: ChatMessageHist
     parser = PydanticOutputParser(pydantic_object=WorkoutSpecification)
 
     if len(history.messages) == 0:
-        history.add_message(prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY.format(format_instructions=parser.get_format_instructions()))
+        prompt = prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY if enable_sleep_hours \
+            else prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY_WITHOUT_SLEEP
+        history.add_message(prompt.format(format_instructions=parser.get_format_instructions()))
 
     history.add_user_message(input())
 
@@ -61,10 +62,14 @@ def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user, e
 
     parser = PydanticOutputParser(pydantic_object=Workout)
 
+    workout_preferences_prompt = prompts.WORKOUT_PREFERENCES_PROMPT if enable_sleep_hours \
+        else prompts.WORKOUT_PREFERENCES_PROMPT_WITHOUT_SLEEP
+
     messages = [
-        prompts.INITIAL_SYSTEM_PROMPT.format(format_instructions=parser.get_format_instructions()),
+        prompts.INITIAL_SYSTEM_PROMPT.format(all_exercises=ALL_EXERCISES,
+                                             format_instructions=parser.get_format_instructions()),
         prompts.USER_CHARACTERISTICS_PROMPT.format(**user_characteristics(user)),
-        prompts.WORKOUT_PREFERENCES_PROMPT.format(
+        workout_preferences_prompt.format(
             duration=workout_spec.duration,
             intensity_level=workout_spec.intensity_level,
             body_area=workout_spec.bodyarea,
