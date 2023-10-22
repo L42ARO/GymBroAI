@@ -296,7 +296,7 @@ const Routine: React.FC<RoutineProps> = ({routine}) => {
                 //Convert the name to lowercase and replace spaces with dashes
                 const name = routine.name.toLowerCase().replace(" ", "_");
                 // Replace with your Flask server URL and filename parameter
-                const response = await fetch(`http://localhost:5000/get-routine-image/${name}`);
+                const response = await fetch(`http://localhost:5500/get-routine-image/${name}`);
                 const blob = await response.blob();
                 const imageUrl = URL.createObjectURL(blob);
                 setImageUrl(imageUrl);
