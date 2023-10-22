@@ -15,7 +15,9 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ name }) => {
   const inputRef = useRef<null | HTMLIonInputElement>(null);
   const [query, setQuery] = useState<string>("");
   var [ROOM, setROOM] = useState<string>("");
-    const { socket, connect, disconnect } = useSocket();
+  const { socket, connect, disconnect } = useSocket();
+  const [requery, setRequery] = useState<boolean>(false);
+  const [chatHistory, setChatHistory] = useState<string>("");
   interface Message{
     sender: string;
     content: string;
@@ -35,6 +37,21 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ name }) => {
       var room = data.room;
       setROOM(room);
     });
+    socket?.on('re-query', (data) => {
+      var response = data.response;
+      var history = data.history;
+      setChatHistory(history);
+      setRequery(true);
+      setMessages(prevMessages => [...prevMessages, {sender: "Server", content: response}]);
+    });
+    socket?.on('workout-response', (data) => {
+      // Data format: {response: string}
+      var response = data.response;
+      console.log(response);
+      //Add to messages as Server Entry
+      //setMessages(prevMessages => [...prevMessages, {sender: "Server", content: response}]);
+    });
+
     return () => {
       disconnect();
     };
@@ -48,7 +65,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ name }) => {
     if (query == "") return;
     setMessages(prevMessages=>[...prevMessages, {sender: "User", content: query}]);
     console.log("Sending message");
-    socket?.emit('user-request', {room: ROOM, query: query});
+    socket?.emit('user-request', {room: ROOM, query: query, requery: requery, history: chatHistory});
     setQuery("");
   }
   //On messages changed console.log messages

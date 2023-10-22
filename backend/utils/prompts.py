@@ -1,5 +1,5 @@
 from langchain.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate
-from workout import ALL_EXERCISES
+from utils.workout import ALL_EXERCISES
 
 INITIAL_SYSTEM_PROMPT = SystemMessagePromptTemplate.from_template(template='''
 You are a personal trainer app which provides workout plans customized
