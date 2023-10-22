@@ -7,6 +7,8 @@ import { useState } from 'react';
 import { IonButton, IonModal } from '@ionic/react';
 import WeightSelector from './WeightSelectorContainer';
 import HeightSelector from './HeightSelectorContainer';
+import AgeSelector from './AgeSelectorContainer';
+import ChoiceSelectorContainer from './ChoiceSelectorContainer';
 
 
 interface YouContainerProps {
@@ -31,6 +33,31 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
     const weight = e; 
     setWeightLabel(weight);
     setShowWeightModal(false);
+  };
+
+  const [showAgeModal, setShowAgeModal] = useState(false);
+  const [AgeLabel, setAgeLabel] = useState(0); // Initialize as needed
+
+  const handleAgeConfirmed = (e:number) => {
+    console.log(e);
+    const age = e; 
+    setAgeLabel(age);
+    setShowAgeModal(false);
+  };
+
+  const [showGendreModal, setShowGendreModal] = useState(false);
+  const [selectedGendre, setSelectedGendre] = useState('');
+
+  const GendreOptions = [
+    { label: 'Male', value: 'Male' },
+    { label: 'Female', value: 'Female' },
+    { label: 'Non-Binary', value: 'Non-Binary' },
+    { label: 'Prefer Not To Disclose', value: 'No Disclosure' },
+  ];
+
+  const handleGendreConfirmed = (e:any) => {
+    setSelectedGendre(e.detail.value);
+    setShowGendreModal(false);
   };
 
 
@@ -73,14 +100,30 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
           </IonItem>
 
           <IonItem>
-            <IonIcon icon={rocketOutline}> </IonIcon>
+            <IonIcon icon={rocketOutline}></IonIcon>
             <IonLabel>Age</IonLabel>
-            {/* <IonLabel>{weeklyGoalLabel}</IonLabel> */}
+            <IonButton onClick={() => setShowAgeModal(true)} className="duration-button">
+              {String(AgeLabel)}
+            </IonButton>
+            <IonModal isOpen={showAgeModal} onDidDismiss={() => setShowAgeModal(false)}>
+              <AgeSelector OnConfirm={handleAgeConfirmed} />
+              <IonButton onClick={() => setShowAgeModal(false)}>Cancel</IonButton>
+            </IonModal>
           </IonItem>
           <IonItem>
             <IonIcon icon={planetOutline}> </IonIcon>
             <IonLabel>Gendre</IonLabel>
-            {/* <IonLabel>{experienceLabel}</IonLabel> */}
+            <IonLabel>{selectedGendre}</IonLabel>
+            <IonButton onClick={() => setShowGendreModal(true)} className="duration-button">
+              {selectedGendre}
+            </IonButton>
+            <IonModal isOpen={showGendreModal} onDidDismiss={() => setShowGendreModal(false)}>
+              <ChoiceSelectorContainer
+              options={GendreOptions}
+              selectedOption={selectedGendre}
+              onChange={handleGendreConfirmed}/>
+              <IonButton onClick={() => setShowGendreModal(false)}>Cancel</IonButton>
+            </IonModal>
           </IonItem>
         </div>
   );
