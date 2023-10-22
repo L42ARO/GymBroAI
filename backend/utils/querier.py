@@ -45,12 +45,13 @@ def query_for_workout_specifications(api_key_path: str, history: ChatMessageHist
             else prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY_WITHOUT_SLEEP
         history.add_message(prompt.format(format_instructions=parser.get_format_instructions()))
     if not enable_sleep_hours:
-        query += " I slept 8 hours last night."
+        query = query + " I slept 8 hours last night."
     history.add_user_message(query)
 
     chat_model = ChatOpenAI(openai_api_key=OPENAI_API_KEY)
 
     response = chat_model(history.messages)
+    print(response.content)
     history.add_ai_message(response.content)
 
     if response.content[0] == "{":
