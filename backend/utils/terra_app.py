@@ -13,9 +13,9 @@ terra = Terra(
     secret="YOUR TERRA SECRET"
 )
 
-def updateUser():
+def updateUser(id):
     global user_id, user, start_date, end_date
-    user_id = "c6e4b3e6-7f89-4708-a795-d473f327fd74"
+    user_id = id
     user = terra.from_user_id(user_id)
     start_date="2023-10-07"
     end_date="2023-10-08"
