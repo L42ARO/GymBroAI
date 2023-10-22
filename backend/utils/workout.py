@@ -43,6 +43,6 @@ class WorkoutSpecification(BaseModel):
     intensity_level: int = Field(description="The intensity level of the workout. Can be the following values: \
                                  0 for low, 1 for medium, or 2 for high.")
     bodyarea: int = Field(description="The part of the body that the user wants to exercise. Can be one of \
-                          6 values: 0 for chest, 1 for shoulders, 2 for back, 3 for arms, 4 for core, or 5 for legs.")
+                          6 numerical values: 0 for chest, 1 for shoulders, 2 for back, 3 for arms, 4 for core, or 5 for legs.")
     hours_slept: float = Field(description="The number of hours that the user slept the previous night. If not provided,\
         set this field to 8.0")
