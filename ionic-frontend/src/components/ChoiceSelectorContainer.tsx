@@ -2,7 +2,13 @@
 import React, { useState } from 'react';
 import { IonRadioGroup, IonRadio, IonLabel, IonItem, IonList, IonButton } from '@ionic/react';
 
-const ChoiceSelectorContainer = ({ options, selectedOption, onChange}) => {
+interface ChoiceSelectorContainerProps {
+  options: { label: string, value: string }[];
+  selectedOption: string;
+  onChange: (e: any) => void;
+}
+
+const ChoiceSelectorContainer:React.FC<ChoiceSelectorContainerProps> = ({ options, selectedOption, onChange}) => {
   return (
     <div>
         <IonList>

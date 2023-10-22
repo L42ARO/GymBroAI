@@ -4,12 +4,12 @@ import { IonButton, IonInput, IonItem, IonLabel } from '@ionic/react';
 
 type OnConfirmType = (height: { feet: number; inches: number}) => void;
 
-interface HeightSelector{
-    onConfirm : OnConfirmType;
+interface HeightSelectorProps{
+    OnConfirm : OnConfirmType;
 }
 
 
-const HeightSelector = ({ OnConfirm }) => {
+const HeightSelector:React.FC<HeightSelectorProps> = ({ OnConfirm }) => {
   const [feet, setFeet] = useState(0);
   const [inches, setInches] = useState(0);
 

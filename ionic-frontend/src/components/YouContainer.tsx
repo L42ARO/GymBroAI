@@ -26,8 +26,9 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [WeightLabel, setWeightLabel] = useState(0); // Initialize as needed
 
-  const handleWeightConfirmed = (e) => {
-    const weight = parseInt(e.detail.value, 10); 
+  const handleWeightConfirmed = (e:number) => {
+    console.log(e);
+    const weight = e; 
     setWeightLabel(weight);
     setShowWeightModal(false);
   };

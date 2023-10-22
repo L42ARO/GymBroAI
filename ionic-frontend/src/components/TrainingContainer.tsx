@@ -5,6 +5,7 @@ import { alarmOutline, barChartOutline, barbellOutline, calendarOutline, planetO
 import { useState } from 'react';
 import DurationSelector from './DurationSelectorContainer';
 import ChoiceSelectorContainer from "./ChoiceSelectorContainer";
+import { IonButtonCustomEvent } from '@ionic/core';
 
 interface TrainingContainerProps {
   name: string;
@@ -51,12 +52,12 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
     setShowDurationModal(false);
   };
   
-  const handleObjectiveConfirmed = (e) => {
+  const handleObjectiveConfirmed = (e:any) => {
     setSelectedObjective(e.detail.value);
     setShowObjectiveModal(false);
   };
 
-  const handleExperienceConfirmed = (e) => {
+  const handleExperienceConfirmed = (e:any) => {
     setSelectedExperience(e.detail.value);
     setShowExperienceModal(false);
   };
