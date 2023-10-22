@@ -4,11 +4,11 @@ import { IonButton, IonInput, IonItem, IonLabel } from '@ionic/react';
 
 type OnConfirmType = (duration: { hours: number; minutes: number; seconds: number }) => void;
 
-interface DurationSelector{
+interface DurationSelectorOps{
     onConfirm : OnConfirmType;
 }
 
-const DurationSelector = ({ onConfirm }) => {
+const DurationSelector:React.FC<DurationSelectorOps> = ({ onConfirm }) => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
