@@ -8,6 +8,7 @@ from PIL import Image
 import base64
 from utils.querier import query_for_workout_specifications, ChatMessageHistory, query_workout
 from io import BytesIO
+from langchain.schema.messages import SystemMessage, HumanMessage, AIMessage
 
 @app.route('/')
 def hello():
@@ -45,9 +46,16 @@ def handle_user_request(data):
     if requery:
         messages= data['history']
         prevHistory = ChatMessageHistory.parse_obj(messages)
-        print(prevHistory['messages'])
+        for i in range(len(prevHistory.messages)):
+            if prevHistory.messages[i].type == "system": 
+                prevHistory.messages[i] = SystemMessage(content = prevHistory.messages[i].content)
+            elif prevHistory.messages[i].type == "ai":
+                prevHistory.messages[i] = AIMessage(content = prevHistory.messages[i].content)
+            elif prevHistory.messages[i].type == "human":
+                prevHistory.messages[i] = HumanMessage(content = prevHistory.messages[i].content)
+        # print(prevHistory['messages'])
         # prevHistory = ChatMessageHistory(messages=messages['messages'])
-        print(prevHistory)
+        # print(prevHistory)
     success, response, history = query_for_workout_specifications("api-key.txt", prevHistory, enable_sleep_hours=False, query=query)
     if not success:
         hist_json = history.json()
