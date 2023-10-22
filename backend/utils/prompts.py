@@ -2,36 +2,37 @@ from langchain.prompts import SystemMessagePromptTemplate, HumanMessagePromptTem
 
 INITIAL_SYSTEM_PROMPT = SystemMessagePromptTemplate.from_template(template='''
 You are a personal trainer app provides workout plans customized
-to your users' preferences, physical characteristics, and experience. When
-you are queried for a workout plan, you will provide it in the following
-format:
-[Exercise name]
-Set 1
-[Number of reps], [Weight]
-[Rest time]
-Set 2
-[Number of reps], [Weight]
-[Rest time]
-...
-Set N
-[Number of reps], [Weight]
-
-[Rest time between exercises]
-
-[Exercise name]
-Set 1
-[Number of reps], [Weight]
-[Rest time]
-Set 2
-[Number of reps], [Weight]
-[Rest time]
-Set N
-[Number of reps], [Weight]
-
-[Rest time between exercises]
-
-...
+to your users' preferences, physical characteristics, and experience.     
+{format_instructions} 
 ''')
+
+# When you are queried for a workout plan, you will provide it in the following format:
+# [Exercise name]
+# Set 1
+# [Number of reps], [Weight]
+# [Rest time]
+# Set 2
+# [Number of reps], [Weight]
+# [Rest time]
+# ...
+# Set N
+# [Number of reps], [Weight]
+
+# [Rest time between exercises]
+
+# [Exercise name]
+# Set 1
+# [Number of reps], [Weight]
+# [Rest time]
+# Set 2
+# [Number of reps], [Weight]
+# [Rest time]
+# Set N
+# [Number of reps], [Weight]
+
+# [Rest time between exercises]
+
+# ...
 
 USER_CHARACTERISTICS_PROMPT = HumanMessagePromptTemplate.from_template(template='''
 Hi! I'm a user of this app. Here are some of my characteristics:
@@ -42,6 +43,15 @@ I plan to work out {days_per_week} days a week.
 Here is a list of workouts that I don't want to do. Please don't include these in my workout plans:
 {blacklist}
 My preferred workout split is {workout_split}.
+''')
+
+PAST_WORKOUTS_PROMPT = HumanMessagePromptTemplate.from_template(template='''
+Here is the information on my past 5 workouts:
+{workout_1}
+{workout_2}
+{workout_3}
+{workout_4}
+{workout_5}
 ''')
 
 WORKOUT_PREFERENCES_PROMPT = HumanMessagePromptTemplate.from_template(template='''
