@@ -4,8 +4,8 @@ from langchain.output_parsers import PydanticOutputParser
 from langchain.memory import ChatMessageHistory
 from typing import Tuple
 
-import prompts
-from workout import WorkoutSpecification, Workout, ALL_EXERCISES
+import utils.prompts as prompts
+from utils.workout import WorkoutSpecification, Workout, ALL_EXERCISES
 
 def user_characteristics(user):
     '''
@@ -32,7 +32,7 @@ def user_characteristics(user):
     }
 
 
-def query_for_workout_specifications(api_key_path: str, history: ChatMessageHistory, enable_sleep_hours: bool)\
+def query_for_workout_specifications(api_key_path: str, history: ChatMessageHistory, enable_sleep_hours: bool, query:str)\
     -> Tuple[bool, str | WorkoutSpecification, ChatMessageHistory]:
     with open(api_key_path) as f:
         OPENAI_API_KEY = f.read()
@@ -43,8 +43,9 @@ def query_for_workout_specifications(api_key_path: str, history: ChatMessageHist
         prompt = prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY if enable_sleep_hours \
             else prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY_WITHOUT_SLEEP
         history.add_message(prompt.format(format_instructions=parser.get_format_instructions()))
-
-    history.add_user_message(input())
+    if not enable_sleep_hours:
+        query += " I slept 8 hours last night."
+    history.add_user_message(query)
 
     chat_model = ChatOpenAI(openai_api_key=OPENAI_API_KEY)
 
