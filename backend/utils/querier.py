@@ -91,7 +91,6 @@ def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user, e
 
     return parser.parse(response.content), history
 
-
 def query_further(api_key_path: str, prompt: str, history: ChatMessageHistory, user) -> Tuple[Workout, ChatMessageHistory]:
     with open(api_key_path) as f:
         OPENAI_API_KEY = f.read()
@@ -108,16 +107,28 @@ def query_further(api_key_path: str, prompt: str, history: ChatMessageHistory, u
 
     return parser.parse(response.content), history
 
-# success, response, history = query_for_workout_specifications("api-key.txt", ChatMessageHistory())
-# while not success:
-#     print(response)
-#     success, response, history = query_for_workout_specifications("api-key.txt", history)
+import json
 
-# workout, history = query_workout("api-key.txt", response, None)
-# print(workout)
+success, response, history = query_for_workout_specifications("api-key.txt", ChatMessageHistory(), False)
+while not success:
+    print(response)
+    history2 = history.json()
+    history2 = ChatMessageHistory.parse_raw(history2)
+    success, response, history3 = query_for_workout_specifications("api-key.txt", history2, False)
 
-# while True:
-#     workout, history = query_further("api-key.txt", input(), history, None)
-#     print(workout)
+workout, history = query_workout("api-key.txt", response, None, False)
+print(workout)
 
+while True:
+    workout, history = query_further("api-key.txt", input(), history, None)
+    print(workout)
 
+# import json
+
+# j = {'messages': [{'content': 'Give me a workout', 'additional_kwargs': {}, 'type': 'human', 'example': False}, \
+#     {'content': 'Sure! Before we proceed, I need some information from you. Could you please provide the following details:\n1. The duration of the workout (in minutes)\n2. The intensity level (low, medium, or high)\n3. The body area that you want to exercise (chest, shoulders, back, arms, core, or legs)', 'additional_kwargs': {}, 'type': 'ai', 'example': False}]}
+
+# j = json.dumps(j)
+# h = ChatMessageHistory.parse_raw(j)
+
+# print(h.messages[0].content)

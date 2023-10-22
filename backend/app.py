@@ -51,7 +51,7 @@ def handle_user_request(data):
     success, response, history = query_for_workout_specifications("api-key.txt", prevHistory, enable_sleep_hours=False, query=query)
     if not success:
         hist_json = history.json()
-        emit('re-query', {'response': response, 'history': history.json()}, room=room)
+        emit('re-query', {'response': response, 'history': query}, room=room)
         return
 
     # Get the workout
