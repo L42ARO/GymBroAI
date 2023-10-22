@@ -1,6 +1,7 @@
 from langchain.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
-
+with open("./backend/utils/exercises_renamed.txt") as f:
+    all_exercises: list[str] = [e.replace("\n", "") for e in f.readlines()]
 
 INITIAL_SYSTEM_PROMPT = SystemMessagePromptTemplate.from_template(template='''
 You are a personal trainer app which provides workout plans customized
@@ -62,6 +63,11 @@ WORKOUT_PREFERENCES_PROMPT = HumanMessagePromptTemplate.from_template(template='
 Today, I'd like to do a {duration} minute, {intensity_level}-intensity {body_area} workout. 
 Last night I slept {hours_slept} hours. Please suggest me a workout according to the output schema
 specified by the system!
+''')
+
+WORKOUT_PREFERENCES_PROMPT_WITHOUT_SLEEP = HumanMessagePromptTemplate.from_template(template='''
+Today, I'd like to do a {duration} minute, {intensity_level}-intensity {body_area} workout. \
+Please suggest me a workout according to the output schema specified by the system!
 ''')
 
 SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY = SystemMessagePromptTemplate.from_template(template='''

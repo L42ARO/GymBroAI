@@ -32,14 +32,6 @@ def user_characteristics(user):
         "workout_split": "push, pull, leg"
     }
 
-class WorkoutSpecification(BaseModel):
-    duration: int = Field(description="The duration of the workout, in minutes.")
-    intensity_level: int = Field(description="The intensity level of the workout. Can be the following values: \
-                                 0 for low, 1 for medium, or 2 for high.")
-    bodyarea: int = Field(description="The part of the body that the user wants to exercise. Can be one of \
-                          6 values: 0 for chest, 1 for shoulders, 2 for back, 3 for arms, 4 for core, or 5 for legs.")
-    hours_slept: float = Field(description="The number of hours that the user slept the previous night.")
-
 
 def query_for_workout_specifications(api_key_path: str, history: ChatMessageHistory)\
     -> Tuple[bool, str | WorkoutSpecification, ChatMessageHistory]:
@@ -63,7 +55,7 @@ def query_for_workout_specifications(api_key_path: str, history: ChatMessageHist
     else:
         return False, response.content, history
 
-def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user) -> Tuple[Workout, ChatMessageHistory]:
+def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user, enable_sleep_hours: bool) -> Tuple[Workout, ChatMessageHistory]:
     with open(api_key_path) as f:
         OPENAI_API_KEY = f.read()
 
@@ -111,16 +103,16 @@ def query_further(api_key_path: str, prompt: str, history: ChatMessageHistory, u
 
     return parser.parse(response.content), history
 
-success, response, history = query_for_workout_specifications("api-key.txt", ChatMessageHistory())
-while not success:
-    print(response)
-    success, response, history = query_for_workout_specifications("api-key.txt", history)
+# success, response, history = query_for_workout_specifications("api-key.txt", ChatMessageHistory())
+# while not success:
+#     print(response)
+#     success, response, history = query_for_workout_specifications("api-key.txt", history)
 
-workout, history = query_workout("api-key.txt", response, None)
-print(workout)
+# workout, history = query_workout("api-key.txt", response, None)
+# print(workout)
 
-while True:
-    workout, history = query_further("api-key.txt", input(), history, None)
-    print(workout)
+# while True:
+#     workout, history = query_further("api-key.txt", input(), history, None)
+#     print(workout)
 
 

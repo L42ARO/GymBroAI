@@ -30,7 +30,15 @@ class Exercise(BaseModel):
     difficulty: ExerciseDifficulty = Field(description="The difficulty level of the exercise. \
                                            Possible values are beginner, intermediate, and expert")
     sets: list[Set] = Field(description="The list of sets to be done for this exercise")
-    
+
 
 class Workout(BaseModel):
     exercises: list[Exercise] = Field(description="The list of exercises to be done for the workout")
+
+class WorkoutSpecification(BaseModel):
+    duration: int = Field(description="The duration of the workout, in minutes.")
+    intensity_level: int = Field(description="The intensity level of the workout. Can be the following values: \
+                                 0 for low, 1 for medium, or 2 for high.")
+    bodyarea: int = Field(description="The part of the body that the user wants to exercise. Can be one of \
+                          6 values: 0 for chest, 1 for shoulders, 2 for back, 3 for arms, 4 for core, or 5 for legs.")
+    hours_slept: float = Field(description="The number of hours that the user slept the previous night.")
