@@ -11,7 +11,9 @@ interface SettingsContainerProps {
 
 const SettingsContainer: React.FC<SettingsContainerProps> = ({ name }) => {
   return (
-        <div className='container'>
+    <IonPage>
+      <IonContent>
+        <div>
           <TrainingContainer 
           name="Training Container"
           routineLabel="3 day classic"
@@ -23,6 +25,8 @@ const SettingsContainer: React.FC<SettingsContainerProps> = ({ name }) => {
           restTimerLabel="60 seconds"></TrainingContainer>
           <YouContainer name='YouContainer'></YouContainer>
         </div>
+      </IonContent>    
+    </IonPage>
   );
 };
 

@@ -1,29 +1,36 @@
 from config.setup import app, socketio
 from flask import send_from_directory
 from flask_socketio import SocketIO, emit, join_room
+import uuid
 
 @app.route('/')
 def hello():
     return 'Hello, World!'
 
+@socketio.on('join-room')
+def handle_join_room():
+    #Generate random id for room
+    room = str(uuid.uuid4())
+    join_room(room)
+    emit('joined-room', {'room': room})
+    
 @socketio.on('user-request')
 def handle_user_request(data):
-    # Data should be formated: {'room': room, 'username': username, 'query': query}
+    # Data should be formated: {'room': room, 'query': query}
     room = data['room']
-    username = data['username']
     query = data['query']
     
     # TODO: Handle query
     res = 'This is a response from the server!'
     res_type = 'text'
     
-    #Based on the response type either emit: 'text-response' or 'image-response' or 'checkbox-response'
+    #response can either be text or list
     if res_type == 'text':
-        emit('text-response', {'room': room, 'username': username, 'content': res})
-    elif res_type == 'image':
-        emit('image-response', {'room': room, 'username': username, 'content': res})
-    elif res_type == 'checkbox':
-        emit('checkbox-response', {'room': room, 'username': username, 'content': res})
+        # Emit response to room
+        emit('text-response', {'response': res}, room=room)
+    elif res_type == 'list':
+        # Emit response to room
+        emit('list-response', {'response': res}, room=room)
     
 
 
