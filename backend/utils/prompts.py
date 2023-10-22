@@ -1,10 +1,13 @@
 from langchain.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from workout import ALL_EXERCISES
 
 INITIAL_SYSTEM_PROMPT = SystemMessagePromptTemplate.from_template(template='''
 You are a personal trainer app which provides workout plans customized
-to your users' preferences, physical characteristics, and experience.     
+to your users' preferences, physical characteristics, and experience. Choose
+all exercises from the following list, keeping the spelling exactly the same:
+{all_exercises}
 {format_instructions}
-END OUTPUT SCHEMA SPECIFICATION                                        
+END OUTPUT SCHEMA SPECIFICATION                                      
 ''')
 
 # When you are queried for a workout plan, you will provide it in the following format:
@@ -62,6 +65,11 @@ Last night I slept {hours_slept} hours. Please suggest me a workout according to
 specified by the system!
 ''')
 
+WORKOUT_PREFERENCES_PROMPT_WITHOUT_SLEEP = HumanMessagePromptTemplate.from_template(template='''
+Today, I'd like to do a {duration} minute, {intensity_level}-intensity {body_area} workout. \
+Please suggest me a workout according to the output schema specified by the system!
+''')
+
 SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY = SystemMessagePromptTemplate.from_template(template='''
 You are a personal trainer app which provides workout plans to your users. A
 user is about to request a workout. They must specify 1. the workout's duration, 2. the workout's intensity level (low, medium, or high),
@@ -70,6 +78,15 @@ If they do not specify all of that information, then prompt the user asking to p
 do this.
 {format_instructions}
 WHEN YOU HAVE RECEIVED ALL FOUR FIELDS, PLEASE PROVIDE ONLY THE ABOVE JSON AND NOTHING ELSE.
+''')
+
+SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY_WITHOUT_SLEEP = SystemMessagePromptTemplate.from_template(template='''
+You are a personal trainer app which provides workout plans to your users. A user is about to request a workout. They must specify 
+1. the workout's duration, 2. the workout's intensity level (low, medium, or high), and 3. the body area that the workout exercises 
+(chest, shoulders, back, arms, core, or legs). If they do not specify all of that information, then prompt the user asking to provide 
+the missing fields. Once you have received all three fields, do this.
+{format_instructions}
+WHEN YOU HAVE RECEIVED ALL THREE FIELDS, PLEASE PROVIDE ONLY THE ABOVE JSON AND NOTHING ELSE.
 ''')
 
 # SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY = SystemMessagePromptTemplate.from_template(template='''

@@ -1,6 +1,9 @@
 from enum import Enum
 from langchain.pydantic_v1 import BaseModel, Field
 
+with open("./backend/utils/exercises_uppercase.txt") as f:
+    ALL_EXERCISES: list[str] = [e.replace("\n", "") for e in f.readlines()]
+
 class ExerciseBodyArea(Enum):
     CHEST = 0
     SHOULDERS = 1
@@ -31,5 +34,14 @@ class Exercise(BaseModel):
                                            Possible values are beginner, intermediate, and expert")
     sets: list[Set] = Field(description="The list of sets to be done for this exercise")
 
+
 class Workout(BaseModel):
     exercises: list[Exercise] = Field(description="The list of exercises to be done for the workout")
+
+class WorkoutSpecification(BaseModel):
+    duration: int = Field(description="The duration of the workout, in minutes.")
+    intensity_level: int = Field(description="The intensity level of the workout. Can be the following values: \
+                                 0 for low, 1 for medium, or 2 for high.")
+    bodyarea: int = Field(description="The part of the body that the user wants to exercise. Can be one of \
+                          6 values: 0 for chest, 1 for shoulders, 2 for back, 3 for arms, 4 for core, or 5 for legs.")
+    hours_slept: float = Field(description="The number of hours that the user slept the previous night.")
