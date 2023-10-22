@@ -1,11 +1,15 @@
 import './TrainingContainer.css';
-import { IonPage, IonContent, IonItem, IonLabel } from '@ionic/react';
+import { IonPage, IonContent, IonItem, IonLabel, IonCard, IonCardContent, IonCardHeader, IonCardTitle } from '@ionic/react';
 import { IonIcon, IonButton, IonModal } from '@ionic/react';
 import { alarmOutline, barChartOutline, barbellOutline, calendarOutline, planetOutline, rocketOutline, starOutline, timerOutline } from 'ionicons/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DurationSelector from './DurationSelectorContainer';
 import ChoiceSelectorContainer from "./ChoiceSelectorContainer";
 import { IonButtonCustomEvent } from '@ionic/core';
+import { useSocket } from '../contexts/socketContext';
+import RoutineContainer from './RoutineContainer';
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"></link>
 
 interface TrainingContainerProps {
   name: string;
@@ -23,6 +27,25 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
   weeklyGoalLabel,
   experienceLabel,
 }) => {
+  //setting up sockets
+  var [ROOM, setROOM] = useState<string>("");
+  const { socket, connect, disconnect } = useSocket();
+
+  useEffect(() => {
+    connect();
+
+    socket?.on('joined-room', (data) => {
+      //Data format: {room: string}
+      var room = data.room;
+      setROOM(room);
+    })
+
+    return () => {
+      disconnect();
+    };
+}, [socket, connect, disconnect]);
+
+
   const [showDurationModal, setShowDurationModal] = useState(false);
   const [durationLabel, setDurationLabel] = useState('0 h 0 m 0 s'); // Initialize as needed
 
@@ -44,30 +67,60 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
     { label: 'Expert', value: 'Expert' },
   ];
 
+  const [showRoutineModal, setShowRoutineModal] = useState(false);
+  const routineChoices = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
  
-
   const handleDurationConfirmed = (duration: { hours: number, minutes: number, seconds: number }) => {
     const newDuration = duration.hours + " h " + duration.minutes + " m " + duration.seconds + " s";
     setDurationLabel(newDuration);
     setShowDurationModal(false);
+    socket.emit('duration-update', { option: 'duration', value: newDuration });
+
   };
   
   const handleObjectiveConfirmed = (e:any) => {
     setSelectedObjective(e.detail.value);
     setShowObjectiveModal(false);
+    socket.emit('objective-update', { option: 'objective', value: e.detail.value });
   };
 
   const handleExperienceConfirmed = (e:any) => {
     setSelectedExperience(e.detail.value);
     setShowExperienceModal(false);
+    socket?.emit('experience-update', { Option: 'experience', value: e.detail.value})
+  };
+
+  const onAnswerChange = (choice:string) => {
+    const updatedAnswers = selectedAnswers.includes(choice)
+    ? selectedAnswers.filter((item:string) => item !== choice)
+    : [...selectedAnswers, choice];
+    setSelectedAnswers(updatedAnswers);
+  }
+
+  const handleRoutineChange = (e:any) => {
+    setShowRoutineModal(false);
+    socket?.emit('routine-update', {Option: 'routine', value: selectedAnswers} )
   };
 
   return (
-        <div>
+    <IonCard>
+      <IonCardHeader>
+        <IonCardTitle>Training Preferences</IonCardTitle>
+      </IonCardHeader>
+      
+      <IonCardContent>
+      <div className='TrainingContainer'>
           <IonItem>
-            <IonIcon icon={calendarOutline}></IonIcon> 
+            <IonIcon icon={calendarOutline}></IonIcon>
             <IonLabel>Routine</IonLabel>
-            <IonLabel>{routineLabel}</IonLabel>
+            <IonButton onClick={() => setShowRoutineModal(true)} className="duration-button">
+              {routineLabel}
+            </IonButton>
+            <IonModal isOpen={showRoutineModal} onDidDismiss={() => setShowRoutineModal(false)}>
+              <RoutineContainer choices= {routineChoices} selectedAnswers = {selectedAnswers} onAnswerChange = {onAnswerChange} handleRoutineChange = {handleRoutineChange}/>
+              <IonButton onClick={() => setShowRoutineModal(false)}>Cancel</IonButton>
+            </IonModal>
           </IonItem>
           <IonItem>
             <IonIcon icon={timerOutline}></IonIcon>
@@ -84,7 +137,6 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
           <IonItem>
             <IonIcon icon={starOutline}> </IonIcon>
             <IonLabel>Objective</IonLabel>
-            <IonLabel>{selectedObjective}</IonLabel>
             <IonButton onClick={() => setShowObjectiveModal(true)} className="duration-button">
               {selectedObjective}
             </IonButton>
@@ -99,17 +151,14 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
           <IonItem>
             <IonIcon icon={barbellOutline}> </IonIcon>
             <IonLabel>Equipment</IonLabel>
-            <IonLabel>{equipmentLabel}</IonLabel>
           </IonItem>
           <IonItem>
             <IonIcon icon={rocketOutline}> </IonIcon>
-            <IonLabel>Weekly Goal</IonLabel>
             <IonLabel>{weeklyGoalLabel}</IonLabel>
           </IonItem>
           <IonItem>
             <IonIcon icon={planetOutline}> </IonIcon>
             <IonLabel>Experience</IonLabel>
-            <IonLabel>{selectedExperience}</IonLabel>
             <IonButton onClick={() => setShowExperienceModal(true)} className="duration-button">
               {selectedExperience}
             </IonButton>
@@ -122,6 +171,11 @@ const TrainingContainer: React.FC<TrainingContainerProps> = ({
             </IonModal>
           </IonItem>
         </div>
+      </IonCardContent>
+
+    </IonCard>
+    
+        
   );
 };
 

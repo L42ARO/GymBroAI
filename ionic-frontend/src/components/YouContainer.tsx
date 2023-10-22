@@ -1,6 +1,6 @@
 // account/name/weight/height/units/age
 import './YouContainer.css';
-import { IonPage, IonContent, IonItem, IonLabel } from '@ionic/react';
+import { IonPage, IonContent, IonItem, IonLabel, IonCard, IonCardHeader, IonCardContent } from '@ionic/react';
 import { IonIcon } from '@ionic/react';
 import { alarmOutline, barChartOutline, barbellOutline, bodyOutline, calendarOutline, diamondOutline, personOutline, planetOutline, rocketOutline, scaleOutline, starOutline, timerOutline } from 'ionicons/icons';
 import { useState } from 'react';
@@ -9,13 +9,34 @@ import WeightSelector from './WeightSelectorContainer';
 import HeightSelector from './HeightSelectorContainer';
 import AgeSelector from './AgeSelectorContainer';
 import ChoiceSelectorContainer from './ChoiceSelectorContainer';
-
+import { useSocket} from '../contexts/socketContext';
+import { useEffect } from 'react';
+import { IonCardTitle } from '@ionic/react';
 
 interface YouContainerProps {
   name: string;
 }
 
 const YouContainer: React.FC<YouContainerProps> = ({name}) => {
+  var [ROOM, setROOM] = useState<string>("");
+  const { socket, connect, disconnect } = useSocket();
+
+  useEffect(() => {
+    connect();
+
+    socket?.on('joined-room', (data) => {
+      //Data format: {room: string}
+      var room = data.room;
+      setROOM(room);
+    })
+
+    return () => {
+      disconnect();
+    };
+}, [socket, connect, disconnect]);
+
+
+
   const [showHeightModal, setShowHeightModal] = useState(false);
   const [heightLabel, setHeightLabel] = useState("0 ft 0 inch"); // Initialize as needed
 
@@ -23,6 +44,7 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
     const newHeight = height.feet + " ft " + height.inches + " inch ";
     setHeightLabel(newHeight);
     setShowHeightModal(false);
+    socket.emit('height-update', { option: 'height', value: newHeight });
   };
 
   const [showWeightModal, setShowWeightModal] = useState(false);
@@ -33,6 +55,7 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
     const weight = e; 
     setWeightLabel(weight);
     setShowWeightModal(false);
+    socket.emit('weight-update', { option: 'weight', value: weight });
   };
 
   const [showAgeModal, setShowAgeModal] = useState(false);
@@ -43,6 +66,7 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
     const age = e; 
     setAgeLabel(age);
     setShowAgeModal(false);
+    socket.emit('age-update', { option: 'age', value: age });
   };
 
   const [showGendreModal, setShowGendreModal] = useState(false);
@@ -58,12 +82,18 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
   const handleGendreConfirmed = (e:any) => {
     setSelectedGendre(e.detail.value);
     setShowGendreModal(false);
+    socket.emit('gendre-update', { option: 'gendre', value: e.detail.value });
   };
 
 
 
   return (
-        <div>
+    <IonCard>
+      <IonCardHeader>
+        <IonCardTitle>About Me</IonCardTitle>
+      </IonCardHeader>
+      <IonCardContent>
+      <div>
           <IonItem>
             <IonIcon icon={personOutline}></IonIcon> 
             <IonLabel>Account</IonLabel>
@@ -113,7 +143,6 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
           <IonItem>
             <IonIcon icon={planetOutline}> </IonIcon>
             <IonLabel>Gendre</IonLabel>
-            <IonLabel>{selectedGendre}</IonLabel>
             <IonButton onClick={() => setShowGendreModal(true)} className="duration-button">
               {selectedGendre}
             </IonButton>
@@ -126,6 +155,9 @@ const YouContainer: React.FC<YouContainerProps> = ({name}) => {
             </IonModal>
           </IonItem>
         </div>
+      </IonCardContent>
+    </IonCard>
+        
   );
 };
 
