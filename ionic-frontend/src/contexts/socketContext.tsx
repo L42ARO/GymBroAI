@@ -13,7 +13,9 @@ const SocketContext = createContext<SocketIOContextProps>({
   disconnect: () => {}
 });
 
-const SOCKET_SERVER_URL = 'http://127.0.0.1:5000'; // Replace with your server URL
+//const SOCKET_SERVER_URL = 'http://127.0.0.1:5000'; // Replace with your server URL
+const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_SERVER_URL;
+
 
 type SocketProviderProps = {
   children: React.ReactNode;
