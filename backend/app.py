@@ -1,9 +1,12 @@
 from config.setup import app, socketio
 from flask import send_from_directory
-from flask_socketio import SocketIO, emit, join_room
+from flask_socketio import SocketIO, emit, join_room, send
 import uuid
 import requests
 import os
+from PIL import Image
+import base64
+from io import BytesIO
 
 @app.route('/')
 def hello():
@@ -24,7 +27,15 @@ def update_duration(data):
     
 @socketio.on('user-request')
 def handle_user_request(data):
-    # Data should be formated: {'room': room, 'query': query}
+    # Data should be formated:
+    # {
+    #   'room': string,
+    #   'query': string,
+    #   'terra-user-id': string
+    #   'history': dict
+    #   'context-props': dict
+    #   're-query': boolean
+    # }
     room = data['room']
     query = data['query']
     
@@ -65,6 +76,38 @@ def handle_terra_auth(data):
     url = response.json()["url"]
     print(url)
     socketio.emit('terra-auth-url', {'url': url}, room=room)
+
+@app.route('/get-routine-image/<path:filename>')
+def get_routine_image(filename):
+    print(filename)
+    image_path = find_image('./workout_images', filename)
+    #Return image from image path
+    return send_from_directory(os.path.dirname(image_path), os.path.basename(image_path))
+
+@socketio.on('get-routine-image')
+def handle_image_request(data):
+    print("---------- GET ROUTINE IMAGE ----------")
+    # Data is formatted: {'room': room, 'image-name': image-name}
+    image_name = data['image-name']
+    # Search for image in workout_images folder going folder by folder
+    image_path = find_image('./workout_images', image_name + '.png')
+    # Open image using PIL
+    with Image.open(image_path) as image:
+        buffered = BytesIO()
+        image.save(buffered, format="JPEG")  # You can change format to PNG or other format if needed
+        
+        # Encode image as base64
+        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+    send({'image': img_str})
+
+def find_image(base_folder, image_name):
+    # Iterate over each directory in the base folder
+    for root, dirs, files in os.walk(base_folder):
+        # Check if the image_name is in the list of files in the current directory
+        if image_name in files:
+            # Return the full path of the found image
+            return os.path.join(root, image_name)
+    return None
 
 
 if __name__ == '__main__':

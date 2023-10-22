@@ -59,7 +59,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ name }) => {
   var sampleWorkout:Workout = {
     routines: [
       {
-        name: "Squats",
+        name: "Bench press",
         dificulty: 0,
         bodyareas: ["Legs"],
         sets: [
@@ -84,7 +84,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ name }) => {
         ]
       },
       {
-        name: "Pushups",
+        name: "Push Up",
         dificulty: 1,
         bodyareas: ["Chest"],
         sets: [
@@ -109,7 +109,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ name }) => {
         ]
       },
       {
-        name: "Pullups",
+        name: "Pull up",
         dificulty: 2,
         bodyareas: ["Back"],
         sets: [
@@ -270,6 +270,27 @@ const Routine: React.FC<RoutineProps> = ({routine}) => {
   const totalSets = routine.sets.length;
   const [timers, setTimers] = useState<number[]>([]);
   const [currentSet, setCurrentSet] = useState<number>(0);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Define the async function inside the useEffect
+        const fetchImage = async () => {
+            try {
+                //Convert the name to lowercase and replace spaces with dashes
+                const name = routine.name.toLowerCase().replace(" ", "_");
+                // Replace with your Flask server URL and filename parameter
+                const response = await fetch(`http://localhost:5000/get-routine-image/${name}`);
+                const blob = await response.blob();
+                const imageUrl = URL.createObjectURL(blob);
+                setImageUrl(imageUrl);
+            } catch (error) {
+                console.error("Error fetching the image:", error);
+            }
+        };
+
+        // Call the async function
+        fetchImage();
+    }, []); // Empty dependency array to run once on component mount
   
   useEffect(() => {
     //Get total 
@@ -335,7 +356,8 @@ const Routine: React.FC<RoutineProps> = ({routine}) => {
   return (
     <div className='flex flex-row p-2 items-center justify-between'>
       <input type="checkbox" className='mx-3' />
-      <img className='rounded-lg' src="https://media.istockphoto.com/id/1281672735/vector/woman-doing-exercise-with-knee-push-up-in-2-steps.jpg?s=612x612&w=0&k=20&c=MKJkBMAmP2dCXc1aygkbo4WHHU8rXTe9zfhi1PuZ77I=" alt="Exercise Image" height="100px" width="100px" />
+      {/* <img className='rounded-lg' src="https://media.istockphoto.com/id/1281672735/vector/woman-doing-exercise-with-knee-push-up-in-2-steps.jpg?s=612x612&w=0&k=20&c=MKJkBMAmP2dCXc1aygkbo4WHHU8rXTe9zfhi1PuZ77I=" alt="Exercise Image" height="100px" width="100px" /> */}
+      {imageUrl && <img className='rounded-lg' src={imageUrl} alt="Exercise Image" height="100px" width="100px" />}
       <div className='p-1 mx-2'>{routine.name}</div>
       <div className={`p-2 mx-2 ${dif_color} text-black rounded-md`}>{DifficultyDict[routine.dificulty]}</div>
       {timeRoutine && 
