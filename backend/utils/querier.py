@@ -33,7 +33,7 @@ def user_characteristics(user):
     }
 
 
-def query_for_workout_specifications(api_key_path: str, history: ChatMessageHistory, enable_sleep_hours: bool, query:str)\
+def query_for_workout_specifications(api_key_path: str, history: ChatMessageHistory, sleep_hours: int, query:str)\
     -> Tuple[bool, str | WorkoutSpecification, ChatMessageHistory]:
     with open(api_key_path) as f:
         OPENAI_API_KEY = f.read()
@@ -41,11 +41,11 @@ def query_for_workout_specifications(api_key_path: str, history: ChatMessageHist
     parser = PydanticOutputParser(pydantic_object=WorkoutSpecification)
 
     if len(history.messages) == 0:
-        prompt = prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY if enable_sleep_hours \
+        prompt = prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY if sleep_hours >= 0 \
             else prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY_WITHOUT_SLEEP
         history.add_message(prompt.format(format_instructions=parser.get_format_instructions()))
-    if not enable_sleep_hours:
-        query = query + " I slept 8 hours last night."
+    if sleep_hours == -1:
+        query += " I slept 8 hours last night."
     history.add_user_message(query)
 
     chat_model = ChatOpenAI(openai_api_key=OPENAI_API_KEY)
@@ -59,13 +59,13 @@ def query_for_workout_specifications(api_key_path: str, history: ChatMessageHist
     else:
         return False, response.content, history
 
-def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user, enable_sleep_hours: bool) -> Tuple[Workout, ChatMessageHistory]:
+def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user, sleep_hours: int) -> Tuple[Workout, ChatMessageHistory]:
     with open(api_key_path) as f:
         OPENAI_API_KEY = f.read()
 
     parser = PydanticOutputParser(pydantic_object=Workout)
 
-    workout_preferences_prompt = prompts.WORKOUT_PREFERENCES_PROMPT if enable_sleep_hours \
+    workout_preferences_prompt = prompts.WORKOUT_PREFERENCES_PROMPT if sleep_hours >= 0 \
         else prompts.WORKOUT_PREFERENCES_PROMPT_WITHOUT_SLEEP
 
     messages = [
@@ -76,7 +76,7 @@ def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user, e
             duration=workout_spec.duration,
             intensity_level=workout_spec.intensity_level,
             body_area=workout_spec.bodyarea,
-            hours_slept=workout_spec.hours_slept
+            hours_slept = workout_spec.hours_slept if sleep_hours == -1 else sleep_hours
         ),
     ]
 

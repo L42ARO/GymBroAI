@@ -23,7 +23,7 @@ class Set(BaseModel):
     weight: int = Field("The weight (in lbs) to be used for the exercise, if applicable. If it's a \
                         time-based or body weight exercise, set this field to 0")
     time: float = Field("How long (in minutes) to perform this exercise for, if applicable. If it's a rep-based exercise, \
-                        set this field to 0")
+                        set this field to 0. Please try to make core exercises time-based instead of rep-based.")
     rest: int = Field("How long to rest after this set, in seconds")
 
 class Exercise(BaseModel):
