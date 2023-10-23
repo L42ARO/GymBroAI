@@ -1,8 +1,7 @@
 from langchain.prompts import ChatPromptTemplate
 from langchain.chat_models import ChatOpenAI
-from langchain.output_parsers import PydanticOutputParser
+from langchain.output_parsers import PydanticOutputParser, OutputFixingParser
 from langchain.memory import ChatMessageHistory
-from langchain.schema.messages import SystemMessage, HumanMessage, AIMessage
 from typing import Tuple
 
 import utils.prompts as prompts
@@ -40,6 +39,11 @@ def query_for_workout_specifications(api_key_path: str, history: ChatMessageHist
 
     parser = PydanticOutputParser(pydantic_object=WorkoutSpecification)
 
+    fixing_parser = OutputFixingParser.from_llm(llm=ChatOpenAI(openai_api_key=OPENAI_API_KEY),
+                                                parser=parser,
+                                                prompt="A field was missing. Please provide all fields!",
+                                                max_retries=2)
+
     if len(history.messages) == 0:
         prompt = prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY if sleep_hours >= 0 \
             else prompts.SYSTEM_PROMPT_FOR_INITIAL_USER_WORKOUT_QUERY_WITHOUT_SLEEP
@@ -55,7 +59,7 @@ def query_for_workout_specifications(api_key_path: str, history: ChatMessageHist
     history.add_ai_message(response.content)
 
     if response.content[0] == "{":
-        return True, parser.parse(response.content), history
+        return True, fixing_parser.parse(response.content), history
     else:
         return False, response.content, history
 
@@ -64,6 +68,11 @@ def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user, s
         OPENAI_API_KEY = f.read()
 
     parser = PydanticOutputParser(pydantic_object=Workout)
+
+    fixing_parser = OutputFixingParser.from_llm(llm=ChatOpenAI(openai_api_key=OPENAI_API_KEY),
+                                                parser=parser,
+                                                prompt="A field was missing. Please provide all fields!",
+                                                max_retries=2)
 
     workout_preferences_prompt = prompts.WORKOUT_PREFERENCES_PROMPT if sleep_hours >= 0 \
         else prompts.WORKOUT_PREFERENCES_PROMPT_WITHOUT_SLEEP
@@ -92,13 +101,17 @@ def query_workout(api_key_path: str, workout_spec: WorkoutSpecification, user, s
     response = chat_model(chat_prompt_template.format_messages())
     history.add_message(response)
 
-    return parser.parse(response.content), history
+    return fixing_parser.parse(response.content), history
 
 def query_further(api_key_path: str, prompt: str, history: ChatMessageHistory, user) -> Tuple[Workout, ChatMessageHistory]:
     with open(api_key_path) as f:
         OPENAI_API_KEY = f.read()
 
     parser = PydanticOutputParser(pydantic_object=Workout)
+    fixing_parser = OutputFixingParser.from_llm(llm=ChatOpenAI(openai_api_key=OPENAI_API_KEY),
+                                                parser=parser,
+                                                prompt="A field was missing. Please provide all fields!",
+                                                max_retries=2)
 
     history.add_message(prompts.FURTHER_QUERY_SYSTEM_CONTEXT.format(format_instructions=parser.get_format_instructions()))
     history.add_user_message(prompt)
@@ -108,39 +121,16 @@ def query_further(api_key_path: str, prompt: str, history: ChatMessageHistory, u
 
     history.add_message(response)
 
-    return parser.parse(response.content), history
+    return fixing_parser.parse(response.content), history
 
-# import json
+success, response, history = query_for_workout_specifications("api-key.txt", ChatMessageHistory(), False)
+while not success:
+    print(response)
+    success, response, history = query_for_workout_specifications("api-key.txt", history, False)
 
-# success, response, history = query_for_workout_specifications("api-key.txt", ChatMessageHistory(), False)
-# while not success:
-#     print(response)
-#     history2 = history.json()
-#     history2 = json.loads(history2)
-#     history2 = ChatMessageHistory.parse_obj(history2)
-#     for i in range(len(history2.messages)):
-#         if history2.messages[i].type == "system": 
-#             history2.messages[i] = SystemMessage(content = history2.messages[i].content)
-#         elif history2.messages[i].type == "ai":
-#             history2.messages[i] = AIMessage(content = history2.messages[i].content)
-#         elif history2.messages[i].type == "human":
-#             history2.messages[i] = HumanMessage(content = history2.messages[i].content)
+workout, history = query_workout("api-key.txt", response, None, False)
+print(workout)
 
-#     success, response, history3 = query_for_workout_specifications("api-key.txt", history2, False)
-
-# workout, history = query_workout("api-key.txt", response, None, False)
-# print(workout)
-
-# while True:
-#     workout, history = query_further("api-key.txt", input(), history, None)
-#     print(workout)
-
-# import json
-
-# j = {'messages': [{'content': 'Give me a workout', 'additional_kwargs': {}, 'type': 'human', 'example': False}, \
-#     {'content': 'Sure! Before we proceed, I need some information from you. Could you please provide the following details:\n1. The duration of the workout (in minutes)\n2. The intensity level (low, medium, or high)\n3. The body area that you want to exercise (chest, shoulders, back, arms, core, or legs)', 'additional_kwargs': {}, 'type': 'ai', 'example': False}]}
-
-# j = json.dumps(j)
-# h = ChatMessageHistory.parse_raw(j)
-
-# print(h.messages[0].content)
+while True:
+    workout, history = query_further("api-key.txt", input(), history, None)
+    print(workout)
